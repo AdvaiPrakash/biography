@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'models/poster_model.dart';
 import 'services/firestore_service.dart';
+import 'main.dart';
 
 class PosterScreen extends StatefulWidget {
   final PosterModelFirestore? existingPosterFirestore;
@@ -273,6 +274,17 @@ class _PosterScreenState extends State<PosterScreen> {
                         child: Text('Story (9:16)'),
                       ),
                     ],
+                  ),
+                  // Logout Button
+                  IconButton(
+                    icon: const Icon(Icons.logout, color: Colors.white),
+                    tooltip: 'Logout',
+                    onPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => SignInScreen()),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
                   ),
                 ],
               ),

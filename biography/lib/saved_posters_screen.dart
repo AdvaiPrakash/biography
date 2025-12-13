@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'services/firestore_service.dart';
 import 'poster_screen.dart';
+import 'main.dart';
 
 class SavedPostersScreen extends StatefulWidget {
   const SavedPostersScreen({super.key});
@@ -78,6 +79,18 @@ class _SavedPostersScreenState extends State<SavedPostersScreen> {
         title: Text('Saved Posters', style: GoogleFonts.anekMalayalam()),
         backgroundColor: const Color(0xFF00BF6D),
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => SignInScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

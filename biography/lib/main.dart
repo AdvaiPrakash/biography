@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'signup_screen.dart';
 import 'saved_posters_screen.dart';
+import 'services/update_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,8 +10,24 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Check for updates after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       // We need a context, but MyApp's context isn't useful for showing dialogs 
+       // on top of the Navigator. 
+       // Ideally, check in the home screen. Moving check to SignInScreen.
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +43,24 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SignInScreen extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
 
-  SignInScreen({super.key});
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final UpdateService _updateService = UpdateService();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateService.checkForUpdate(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +74,7 @@ class SignInScreen extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.1),
-                  Image.asset('assets/logo.png', height: 100),
+                  Image.asset('assets/icon-black.png', height: 70),
                   SizedBox(height: constraints.maxHeight * 0.1),
                   Text(
                     "Sign In",
@@ -59,7 +89,7 @@ class SignInScreen extends StatelessWidget {
                       children: [
                         TextFormField(
                           decoration: const InputDecoration(
-                            hintText: 'Email Id',
+                            hintText: 'Username',
                             filled: true,
                             fillColor: Color(0xFFF5FCF9),
                             contentPadding: EdgeInsets.symmetric(
@@ -73,9 +103,17 @@ class SignInScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          keyboardType: TextInputType.emailAddress,
                           onSaved: (email) {
                             // Save it
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter username';
+                            }
+                            if (value != 'biouser') {
+                              return 'Invalid username';
+                            }
+                            return null;
                           },
                         ),
                         Padding(
@@ -100,6 +138,15 @@ class SignInScreen extends StatelessWidget {
                             onSaved: (password) {
                               // Save it
                             },
+                             validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter password';
+                            }
+                            if (value != 'bio123') {
+                              return 'Invalid password';
+                            }
+                            return null;
+                          },
                           ),
                         ),
                         ElevatedButton(
@@ -113,6 +160,10 @@ class SignInScreen extends StatelessWidget {
                                       const SavedPostersScreen(),
                                 ),
                               );
+                            } else {
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Invalid credentials')),
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -123,50 +174,6 @@ class SignInScreen extends StatelessWidget {
                             shape: const StadiumBorder(),
                           ),
                           child: const Text("Sign in"),
-                        ),
-                        const SizedBox(height: 16.0),
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Forgot Password?',
-                            style: Theme.of(context).textTheme.bodyMedium!
-                                .copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: 0.64),
-                                ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignUpScreen(),
-                              ),
-                            );
-                          },
-                          child: Text.rich(
-                            const TextSpan(
-                              text: "Don't have an account? ",
-                              children: [
-                                TextSpan(
-                                  text: "Sign Up",
-                                  style: TextStyle(color: Color(0xFF00BF6D)),
-                                ),
-                              ],
-                            ),
-                            style: Theme.of(context).textTheme.bodyMedium!
-                                .copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: 0.64),
-                                ),
-                          ),
                         ),
                       ],
                     ),
