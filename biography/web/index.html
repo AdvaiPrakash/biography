@@ -33,6 +33,21 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDI2cbapoZfZBc3Lu_uH2ucCx9dPngBoKU",
+      authDomain: "biography-b7be4.firebaseapp.com",
+      projectId: "biography-b7be4",
+      storageBucket: "biography-b7be4.firebasestorage.app",
+      messagingSenderId: "49854212410",
+      appId: "1:49854212410:web:53f3cb44832266cc7c6c803",
+      measurementId: "G-SZDCXL2PM3"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

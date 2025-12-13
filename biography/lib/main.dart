@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'signup_screen.dart';
+import 'saved_posters_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -39,10 +44,7 @@ class SignInScreen extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.1),
-                  Image.network(
-                    "https://i.postimg.cc/nz0YBQcH/Logo-light.png",
-                    height: 100,
-                  ),
+                  Image.asset('assets/logo.png', height: 100),
                   SizedBox(height: constraints.maxHeight * 0.1),
                   Text(
                     "Sign In",
@@ -104,7 +106,13 @@ class SignInScreen extends StatelessWidget {
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
-                              // Navigate to the main screen
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SavedPostersScreen(),
+                                ),
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(

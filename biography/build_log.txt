@@ -1,0 +1,19 @@
+Running Gradle task 'assembleRelease'...                        
+e: file:///C:/Users/advai/AppData/Local/Pub/Cache/hosted/pub.dev/image_gallery_saver_plus-3.0.5/android/src/main/kotlin/com/example/image_gallery_saver_plus/ImageGallerySaverPlusPlugin.kt:21:48 Unresolved reference 'Registrar'.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':image_gallery_saver_plus:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 7s
+Running Gradle task 'assembleRelease'...                            7.6s
+Gradle task assembleRelease failed with exit code 1

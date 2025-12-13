@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'poster_screen.dart';
 
 class SignUpScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -17,10 +18,7 @@ class SignUpScreen extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.08),
-                  Image.network(
-                    "https://i.postimg.cc/nz0YBQcH/Logo-light.png",
-                    height: 100,
-                  ),
+                  Image.asset('assets/logo.png', height: 100),
                   SizedBox(height: constraints.maxHeight * 0.08),
                   Text(
                     "Sign Up",
@@ -181,6 +179,25 @@ class SignUpScreen extends StatelessWidget {
                                       .color!
                                       .withValues(alpha: 0.64),
                                 ),
+                          ),
+                        ),
+                        const SizedBox(height: 16.0),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PosterScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.image),
+                          label: const Text("Create Poster"),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF00BF6D),
+                            minimumSize: const Size(double.infinity, 48),
+                            shape: const StadiumBorder(),
+                            side: const BorderSide(color: Color(0xFF00BF6D)),
                           ),
                         ),
                       ],
