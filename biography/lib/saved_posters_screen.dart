@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'services/firestore_service.dart';
 import 'poster_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 
 class SavedPostersScreen extends StatefulWidget {
@@ -83,11 +84,15 @@ class _SavedPostersScreenState extends State<SavedPostersScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => SignInScreen()),
-              );
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+              if (context.mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignInScreen()),
+                );
+              }
             },
           ),
         ],

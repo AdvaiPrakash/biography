@@ -4,14 +4,21 @@ import 'firebase_options.dart';
 import 'saved_posters_screen.dart';
 import 'services/update_service.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  final prefs = await SharedPreferences.getInstance();
+  final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final UpdateService? updateService;
+  final bool isLoggedIn;
+
+  const MyApp({super.key, this.updateService, this.isLoggedIn = false});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -38,13 +45,17 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00BF6D)),
         useMaterial3: true,
       ),
-      home: SignInScreen(),
+      home: widget.isLoggedIn 
+        ? const SavedPostersScreen() 
+        : SignInScreen(updateService: widget.updateService),
     );
   }
 }
 
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+  final UpdateService? updateService;
+
+  const SignInScreen({super.key, this.updateService});
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -52,15 +63,18 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
-  final UpdateService _updateService = UpdateService();
+  late final UpdateService _updateService;
 
   @override
   void initState() {
     super.initState();
+    _updateService = widget.updateService ?? UpdateService();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateService.checkForUpdate(context);
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -150,16 +164,22 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SavedPostersScreen(),
-                                ),
-                              );
+                              
+                              final prefs = await SharedPreferences.getInstance();
+                              await prefs.setBool('isLoggedIn', true);
+
+                              if (context.mounted) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SavedPostersScreen(),
+                                  ),
+                                );
+                              }
                             } else {
                                ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Invalid credentials')),
