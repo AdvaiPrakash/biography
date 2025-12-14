@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'saved_posters_screen.dart';
 import 'product_list_screen.dart';
 import 'customer_list_screen.dart';
+import 'billing_screen.dart';
+import 'admin_update_screen.dart';
 import 'order_list_screen.dart';
 import 'invoice_list_screen.dart';
 import 'main.dart';
@@ -72,6 +74,18 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     _buildDashboardCard(
                       context,
+                      title: 'Billing',
+                      icon: Icons.receipt_long,
+                      color: Colors.blueAccent,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BillingScreen(),
+                        ),
+                      ),
+                    ),
+                    _buildDashboardCard(
+                      context,
                       title: 'Posters',
                       icon: Icons.image,
                       color: const Color(0xFF00BF6D),
@@ -127,6 +141,18 @@ class DashboardScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const InvoiceListScreen(),
+                        ),
+                      ),
+                    ),
+                    _buildDashboardCard(
+                      context,
+                      title: 'App Updates',
+                      icon: Icons.system_update,
+                      color: Colors.pink,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminUpdateScreen(),
                         ),
                       ),
                     ),

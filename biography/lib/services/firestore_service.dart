@@ -167,6 +167,20 @@ class FirestoreService {
   Future<void> addInvoice(InvoiceModel invoice) async {
     await _invoicesCollection.add(invoice.toMap());
   }
+
+  // App Config
+  Future<Map<String, dynamic>?> getAppConfig() async {
+    final doc =
+        await FirebaseFirestore.instance.collection('app_config').doc('updates').get();
+    return doc.data();
+  }
+
+  Future<void> updateAppConfig(String version, String url) async {
+    await FirebaseFirestore.instance.collection('app_config').doc('updates').set({
+      'latest_version': version,
+      'apk_url': url,
+    }, SetOptions(merge: true));
+  }
 }
 
 class PosterModelFirestore extends PosterModel {
