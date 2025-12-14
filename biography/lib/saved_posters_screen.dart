@@ -80,22 +80,7 @@ class _SavedPostersScreenState extends State<SavedPostersScreen> {
         title: Text('Saved Posters', style: GoogleFonts.anekMalayalam()),
         backgroundColor: const Color(0xFF00BF6D),
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
-              if (context.mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignInScreen()),
-                );
-              }
-            },
-          ),
-        ],
+        actions: const [],
       ),
       body: Column(
         children: [

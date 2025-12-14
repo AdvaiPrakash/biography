@@ -1,0 +1,195 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'saved_posters_screen.dart';
+import 'product_list_screen.dart';
+import 'customer_list_screen.dart';
+import 'order_list_screen.dart';
+import 'invoice_list_screen.dart';
+import 'main.dart';
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5FCF9),
+      appBar: AppBar(
+        title: Text(
+          'Dashboard',
+          style: GoogleFonts.anekMalayalam(
+             fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color(0xFF00BF6D),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+              if (context.mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SignInScreen()),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome Back',
+                style: GoogleFonts.anekMalayalam(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2D3E36),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Manage your biography content',
+                style: GoogleFonts.anekMalayalam(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 48),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 24,
+                  crossAxisSpacing: 24,
+                  children: [
+                    _buildDashboardCard(
+                      context,
+                      title: 'Posters',
+                      icon: Icons.image,
+                      color: const Color(0xFF00BF6D),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SavedPostersScreen(),
+                        ),
+                      ),
+                    ),
+                    _buildDashboardCard(
+                      context,
+                      title: 'Products',
+                      icon: Icons.shopping_bag,
+                      color: const Color(0xFF2D3E36),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProductListScreen(),
+                        ),
+                      ),
+                    ),
+                    _buildDashboardCard(
+                      context,
+                      title: 'Customers',
+                      icon: Icons.people,
+                      color: const Color(0xFF1E88E5), // Blue shade
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CustomerListScreen(),
+                        ),
+                      ),
+                    ),
+                    _buildDashboardCard(
+                      context,
+                      title: 'Orders',
+                      icon: Icons.shopping_basket,
+                      color: const Color(0xFFFF9800), // Orange
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const OrderListScreen(),
+                        ),
+                      ),
+                    ),
+                    _buildDashboardCard(
+                      context,
+                      title: 'Invoices',
+                      icon: Icons.receipt,
+                      color: const Color(0xFF9C27B0), // Purple
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const InvoiceListScreen(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 4,
+      shadowColor: color.withOpacity(0.3),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.8),
+                color,
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 40, color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: GoogleFonts.anekMalayalam(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

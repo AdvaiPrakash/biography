@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'saved_posters_screen.dart';
 import 'services/update_service.dart';
+import 'dashboard_screen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,7 +47,7 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       home: widget.isLoggedIn 
-        ? const SavedPostersScreen() 
+        ? const DashboardScreen() 
         : SignInScreen(updateService: widget.updateService),
     );
   }
@@ -176,7 +177,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const SavedPostersScreen(),
+                                        const DashboardScreen(),
                                   ),
                                 );
                               }

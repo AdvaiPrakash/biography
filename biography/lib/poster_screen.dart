@@ -531,51 +531,73 @@ class _PosterScreenState extends State<PosterScreen> {
   }
 
   void _showEditDialog() {
+    // Strip '₹' for editing
     final titleController = TextEditingController(text: _title);
-    final priceController = TextEditingController(text: _price);
+    final priceController = TextEditingController(
+      text: _price.replaceAll('₹', '').trim(),
+    );
     final unitController = TextEditingController(text: _unit);
-    final offerPriceController = TextEditingController(text: _offerPrice);
+    final offerPriceController = TextEditingController(
+      text: _offerPrice.replaceAll('₹', '').trim(),
+    );
     final descController = TextEditingController(text: _description);
+
+    const inputDecoration = InputDecoration(
+      border: OutlineInputBorder(),
+      isDense: true,
+      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    );
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Poster'),
+        title: const Text('Edit Poster Details', style: TextStyle(fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(labelText: 'Product Name'),
+                decoration: inputDecoration.copyWith(
+                  labelText: 'Product Name',
+                  hintText: 'Enter product name',
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextField(
                 controller: priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Price (e.g. ₹120)',
+                keyboardType: TextInputType.number,
+                decoration: inputDecoration.copyWith(
+                  labelText: 'Price',
+                  prefixText: '₹ ',
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextField(
                 controller: unitController,
-                decoration: const InputDecoration(
-                  labelText: 'Unit (e.g. per 1Kg)',
+                decoration: inputDecoration.copyWith(
+                  labelText: 'Unit',
+                  hintText: 'e.g. per kg',
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextField(
                 controller: offerPriceController,
-                decoration: const InputDecoration(
-                  labelText: 'Offer Price (optional)',
-                  hintText: 'Leave empty if no offer',
+                keyboardType: TextInputType.number,
+                decoration: inputDecoration.copyWith(
+                  labelText: 'Offer Price (Optional)',
+                  prefixText: '₹ ',
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextField(
                 controller: descController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
+                decoration: inputDecoration.copyWith(
+                  labelText: 'Description',
+                  hintText: 'Enter product description',
+                ),
+                maxLines: 4,
+                 minLines: 2,
               ),
             ],
           ),
@@ -589,14 +611,23 @@ class _PosterScreenState extends State<PosterScreen> {
             onPressed: () {
               setState(() {
                 _title = titleController.text;
-                _price = priceController.text;
+                // Add '₹' back if not empty
+                _price = priceController.text.isNotEmpty 
+                    ? '₹${priceController.text}' 
+                    : '';
                 _unit = unitController.text;
-                _offerPrice = offerPriceController.text;
+                _offerPrice = offerPriceController.text.isNotEmpty
+                    ? '₹${offerPriceController.text}'
+                    : '';
                 _description = descController.text;
               });
               Navigator.pop(context);
             },
-            child: const Text('Save'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF00BF6D),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Save Changes'),
           ),
         ],
       ),

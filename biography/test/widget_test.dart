@@ -11,7 +11,7 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp(updateService: MockUpdateService()));
 
-    // Verify that the login screen is displayed.
+    // Verify that the login screen is displayed (default is not logged in).
     expect(find.text('Sign In'), findsOneWidget);
     expect(find.text('Username'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
