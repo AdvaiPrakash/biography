@@ -8,6 +8,11 @@ class ProductModel {
   final String unit;
   final String description;
   final String? imageBase64;
+  // New Fields
+  final String category;
+  final String barcode;
+  final String stockQuantity;
+
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -19,6 +24,9 @@ class ProductModel {
     required this.unit,
     required this.description,
     this.imageBase64,
+    this.category = 'General',
+    this.barcode = '',
+    this.stockQuantity = '0',
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : createdAt = createdAt ?? DateTime.now(),
@@ -32,6 +40,9 @@ class ProductModel {
       'unit': unit,
       'description': description,
       'imageBase64': imageBase64,
+      'category': category,
+      'barcode': barcode,
+      'stockQuantity': stockQuantity,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -47,6 +58,9 @@ class ProductModel {
       unit: data['unit'] as String,
       description: data['description'] as String,
       imageBase64: data['imageBase64'] as String?,
+      category: data['category'] as String? ?? 'General',
+      barcode: data['barcode'] as String? ?? '',
+      stockQuantity: data['stockQuantity'] as String? ?? '0',
       createdAt: DateTime.parse(data['createdAt'] as String),
       updatedAt: DateTime.parse(data['updatedAt'] as String),
     );
@@ -60,6 +74,9 @@ class ProductModel {
     String? unit,
     String? description,
     String? imageBase64,
+    String? category,
+    String? barcode,
+    String? stockQuantity,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -71,8 +88,24 @@ class ProductModel {
       unit: unit ?? this.unit,
       description: description ?? this.description,
       imageBase64: imageBase64 ?? this.imageBase64,
+      category: category ?? this.category,
+      barcode: barcode ?? this.barcode,
+      stockQuantity: stockQuantity ?? this.stockQuantity,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
     );
   }
+
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is ProductModel &&
+      other.id == id &&
+      other.title == title;
+  }
+
+  @override
+  int get hashCode => id.hashCode ^ title.hashCode;
 }

@@ -8,11 +8,14 @@ class OrderModel {
   final String status;
   final DateTime date;
 
+  final List<Map<String, dynamic>> items;
+
   OrderModel({
     this.id,
     required this.orderNumber,
     required this.customerName,
     required this.totalAmount,
+    required this.items,
     required this.status,
     DateTime? date,
   }) : date = date ?? DateTime.now();
@@ -22,6 +25,7 @@ class OrderModel {
       'orderNumber': orderNumber,
       'customerName': customerName,
       'totalAmount': totalAmount,
+      'items': items,
       'status': status,
       'date': date.toIso8601String(),
     };
@@ -34,6 +38,7 @@ class OrderModel {
       orderNumber: data['orderNumber'] as String,
       customerName: data['customerName'] as String,
       totalAmount: (data['totalAmount'] as num).toDouble(),
+      items: List<Map<String, dynamic>>.from(data['items'] ?? []),
       status: data['status'] as String,
       date: DateTime.parse(data['date'] as String),
     );

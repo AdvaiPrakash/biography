@@ -42,4 +42,24 @@ class CustomerModel {
       joinedAt: DateTime.parse(data['joinedAt'] as String),
     );
   }
+
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is CustomerModel &&
+      other.id == id &&
+      other.name == name &&
+      other.email == email &&
+      other.phone == phone;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+      name.hashCode ^
+      email.hashCode ^
+      phone.hashCode;
+  }
 }

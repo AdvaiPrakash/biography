@@ -51,6 +51,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
           orderNumber: 'ORD-${random.nextInt(99999).toString().padLeft(5, '0')}',
           customerName: customers[random.nextInt(customers.length)],
           totalAmount: (random.nextInt(5000) + 500).toDouble(),
+          items: [],
           status: random.nextBool() ? 'Completed' : 'Pending',
           date: DateTime.now().subtract(Duration(days: random.nextInt(30))),
         ));

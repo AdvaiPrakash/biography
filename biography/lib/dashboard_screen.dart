@@ -4,14 +4,40 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'saved_posters_screen.dart';
 import 'product_list_screen.dart';
 import 'customer_list_screen.dart';
+import 'category_management_screen.dart';
 import 'billing_screen.dart';
+
 import 'admin_update_screen.dart';
 import 'order_list_screen.dart';
 import 'invoice_list_screen.dart';
 import 'main.dart';
 
-class DashboardScreen extends StatelessWidget {
+import 'user_management_screen.dart';
+import 'admin_log_screen.dart';
+import 'services/firestore_service.dart';
+
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  String _userType = 'Staff'; // Default to restricted
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userType = prefs.getString('userType') ?? 'Staff';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +91,44 @@ class DashboardScreen extends StatelessWidget {
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 20),
+              // Metrics Section
+              FutureBuilder<Map<String, dynamic>>(
+                future: FirestoreService().getDashboardMetrics(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return const SizedBox.shrink();
+                  final data = snapshot.data!;
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildMetricItem(
+                          'Today\'s Sales', 
+                          '₹${(data['todaySales'] as double).toStringAsFixed(0)}', 
+                          Colors.green
+                        ),
+                        _buildMetricItem(
+                          'Low Stock', 
+                          '${data['itemsLowStock']}', 
+                          Colors.orange
+                        ),
+                        _buildMetricItem(
+                          'Total Orders', 
+                          '${data['recentOrderCount']}', 
+                          Colors.blue
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -110,6 +173,18 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     _buildDashboardCard(
                       context,
+                      title: 'Categories',
+                      icon: Icons.category,
+                      color: Colors.brown,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CategoryManagementScreen(),
+                        ),
+                      ),
+                    ),
+                    _buildDashboardCard(
+                      context,
                       title: 'Customers',
                       icon: Icons.people,
                       color: const Color(0xFF1E88E5), // Blue shade
@@ -144,6 +219,19 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (_userType == 'Admin')
+                      _buildDashboardCard(
+                        context,
+                        title: 'Users',
+                        icon: Icons.manage_accounts,
+                        color: Colors.blueGrey,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UserManagementScreen(),
+                          ),
+                        ),
+                      ),
                     _buildDashboardCard(
                       context,
                       title: 'App Updates',
@@ -156,6 +244,19 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (_userType == 'Admin')
+                      _buildDashboardCard(
+                        context,
+                        title: 'Logs',
+                        icon: Icons.history,
+                        color: Colors.blueGrey,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AdminLogScreen(),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -163,6 +264,15 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMetricItem(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(value, style: GoogleFonts.anekMalayalam(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+        Text(label, style: GoogleFonts.anekMalayalam(fontSize: 12, color: Colors.grey)),
+      ],
     );
   }
 

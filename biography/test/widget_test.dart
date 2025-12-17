@@ -13,7 +13,7 @@ void main() {
 
     // Verify that the login screen is displayed (default is not logged in).
     expect(find.text('Sign In'), findsOneWidget);
-    expect(find.text('Username'), findsOneWidget);
+    expect(find.text('Username (Email/Name)'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
   });
 }

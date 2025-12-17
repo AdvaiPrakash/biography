@@ -4,6 +4,8 @@ import '../models/product_model.dart';
 import '../models/customer_model.dart';
 import '../models/order_model.dart';
 import '../models/invoice_model.dart';
+import '../models/category_model.dart';
+import '../models/user_model.dart';
 
 class FirestoreService {
   static final FirestoreService _instance = FirestoreService._internal();
@@ -110,6 +112,24 @@ class FirestoreService {
     }
     return null;
   }
+  
+  // Update Product Stock
+  Future<void> updateProductStock(String docId, int quantityChange) async {
+    final docRef = _productsCollection.doc(docId);
+    
+    return FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) throw Exception('Product not found');
+      
+      final currentStockStr = snapshot.get('stockQuantity') as String? ?? '0';
+      int currentStock = int.tryParse(currentStockStr) ?? 0;
+      
+      int newStock = currentStock + quantityChange;
+      if (newStock < 0) newStock = 0; // Prevent negative stock for now
+      
+      transaction.update(docRef, {'stockQuantity': newStock.toString()});
+    });
+  }
 
   // Customers Collection
   final CollectionReference _customersCollection = FirebaseFirestore.instance
@@ -180,6 +200,136 @@ class FirestoreService {
       'latest_version': version,
       'apk_url': url,
     }, SetOptions(merge: true));
+  }
+
+  // Categories Collection
+  final CollectionReference _categoriesCollection = FirebaseFirestore.instance
+      .collection('categories');
+
+  Future<List<CategoryModel>> getAllCategories() async {
+    final snapshot = await _categoriesCollection.orderBy('name').get();
+    return snapshot.docs.map((doc) => CategoryModel.fromFirestore(doc)).toList();
+  }
+
+  Future<void> addCategory(CategoryModel category) async {
+    await _categoriesCollection.add(category.toMap());
+  }
+
+  Future<void> updateCategory(String id, CategoryModel category) async {
+    await _categoriesCollection.doc(id).update(category.toMap());
+  }
+
+  Future<void> deleteCategory(String id) async {
+    await _categoriesCollection.doc(id).delete();
+  }
+
+  // Check product dependency on category
+  Future<List<ProductModel>> getProductsByCategory(String categoryName) async {
+    final snapshot = await _productsCollection
+        .where('category', isEqualTo: categoryName)
+        .get();
+    return snapshot.docs.map((doc) => ProductModel.fromFirestore(doc)).toList();
+  }
+
+  // Users Collection
+  final CollectionReference _usersCollection = FirebaseFirestore.instance
+      .collection('users');
+
+  Future<List<UserModel>> getAllUsers() async {
+    final snapshot = await _usersCollection.orderBy('name').get();
+    return snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
+  }
+
+  Future<void> addUser(UserModel user) async {
+    await _usersCollection.add(user.toMap());
+  }
+
+  Future<void> updateUser(String id, UserModel user) async {
+    await _usersCollection.doc(id).update(user.toMap());
+  }
+
+  Future<void> deleteUser(String id) async {
+    await _usersCollection.doc(id).delete();
+  }
+
+  // Simple Auth Check (Insecure for production, but fits requirement structure)
+  Future<UserModel?> loginUser(String username, String password) async {
+    // Checking against email or name for "username"
+    // Ideally use email
+    final snapshot = await _usersCollection.get();
+    for (var doc in snapshot.docs) {
+      final user = UserModel.fromFirestore(doc);
+      // Check email or name matches username, and password matches
+      if ((user.email == username || user.name == username) && user.password == password) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  // Invoice Number Counter
+  Future<String> getNextInvoiceNumber() async {
+    final docRef = FirebaseFirestore.instance.collection('app_config').doc('counters');
+    
+    return FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      
+      int currentCount = 0;
+      if (snapshot.exists && snapshot.data()!.containsKey('invoice_count')) {
+        currentCount = snapshot.data()!['invoice_count'] as int;
+      }
+      
+      final nextCount = currentCount + 1;
+      transaction.set(docRef, {'invoice_count': nextCount}, SetOptions(merge: true));
+      
+      // Format: INV-YYYY-XXXXXX
+      final year = DateTime.now().year;
+      final formattedCount = nextCount.toString().padLeft(6, '0');
+      return 'INV-$year-$formattedCount';
+    });
+  }
+  // Dashboard Metrics
+  Future<Map<String, dynamic>> getDashboardMetrics() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    
+    // Get Orders/Invoices for calculation
+    final ordersSnapshot = await _ordersCollection.get();
+    final productsSnapshot = await _productsCollection.get();
+    
+    double todaySales = 0;
+    double totalSales = 0;
+    int itemsLowStock = 0;
+    double potentialStockValue = 0;
+    
+    // Order Metrics
+    for (var doc in ordersSnapshot.docs) {
+      final order = OrderModel.fromFirestore(doc);
+      totalSales += order.totalAmount;
+      if (order.date.isAfter(startOfDay)) {
+        todaySales += order.totalAmount;
+      }
+    }
+    
+    // Product Metrics
+    for (var doc in productsSnapshot.docs) {
+      final product = ProductModel.fromFirestore(doc);
+      int stock = int.tryParse(product.stockQuantity) ?? 0;
+      double price = double.tryParse(product.price.replaceAll('₹', '')) ?? 0.0;
+      
+      potentialStockValue += stock * price;
+      if (stock < 5) {
+        itemsLowStock++;
+      }
+    }
+    
+    return {
+      'todaySales': todaySales,
+      'totalSales': totalSales,
+      'itemsLowStock': itemsLowStock,
+      'stockValue': potentialStockValue,
+      'recentOrderCount': ordersSnapshot.docs.length, // Just total for now
+    };
   }
 }
 
